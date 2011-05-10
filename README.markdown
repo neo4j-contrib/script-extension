@@ -6,16 +6,17 @@ You need to install the (unreleased neo4j.rb 1.1.0.beta.4)
 Installation
 ------------
 
-* create a folder in your server home folder, named jruby
-* add a Gemfile in this folder:
+1. create a folder in your server home folder, named jruby
 
-    gem 'json'
-    gem 'twitter'
-    gem 'neo4j', '1.1.0.beta.4'  # Unlreased !!!
+2. add a Gemfile in this folder:
+
+     gem 'json'
+     gem 'twitter'
+     gem 'neo4j', '1.1.0.beta.4'  # Unlreased !!!
 
 Now you can install those gems in the server
 
-   curl http://localhost:7474/jruby/install
+     curl http://localhost:7474/jruby/install
 
 Example:
 -------
