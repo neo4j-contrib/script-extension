@@ -38,7 +38,6 @@ public class JRubyResource {
     public Response install() {
         ScriptingContainer container = new ScriptingContainer(LocalContextScope.CONCURRENT);
         container.setHomeDirectory("/home/andreas/.rvm/rubies/jruby-1.6.1");   // needs for "require 'rubygems'"
-        System.out.println("jrubyhome: " + container.getHomeDirectory());
 
         String gemFile = new File(getRubyHome(), "Gemfile").toString();
         if (! new File(gemFile).exists())
@@ -46,16 +45,15 @@ public class JRubyResource {
 
         // tell jruby where the Gemfile is located.
         container.runScriptlet("ENV['BUNDLE_GEMFILE'] = \"" + gemFile + "\"");
-        System.out.println("Set GEMFILE");
         container.runScriptlet("require 'rubygems'");
-        System.out.println("require rubygems");
         container.runScriptlet("require 'bundler/setup'");
-        System.out.println("require 'bundler/setup'");
         container.runScriptlet("Bundler.require");
         container.runScriptlet("require 'neo4j'");
-        System.out.println("required neo4j");
         container.runScriptlet("require 'json'");
         container.runScriptlet("require 'twitter'");
+
+        container.put("$NEO_SERVER", this.database);
+        container.runScriptlet("Neo4j.start(nil, $NEO_SERVER)");
 
         return Response.status(Response.Status.OK).entity(
                 "installed".getBytes()).build();
