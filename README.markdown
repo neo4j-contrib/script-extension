@@ -10,9 +10,11 @@ Installation
 
 2. add a Gemfile in this folder
 
-    gem 'json'
-    gem 'twitter'
-    gem 'neo4j', '1.1.0.beta.4'  # Unlreased !!!
+```
+gem 'json'
+gem 'twitter'
+gem 'neo4j', '1.1.0.beta.4'  # Unlreased !!!
+```
 
 Now you can install those gems in the server
 
