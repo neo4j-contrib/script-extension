@@ -1,4 +1,4 @@
-package org.neo4j.examples.server.unmanaged;
+package org.neo4j.server.scriptextension;
 
 import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.ScriptingContainer;
@@ -95,6 +95,17 @@ public class JRubyResource {
         ScriptingContainer container = scriptingContainer();
 
         Object result = container.runScriptlet(is, "eval.rb");
+
+        // Do stuff with the database
+        return Response.status(Response.Status.OK).entity(
+                (result.toString()).getBytes()).build();
+    }
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/eval2")
+    public Response eval2(@Context ScriptingContainer container, String input) {
+
+        Object result = container.runScriptlet(input);
 
         // Do stuff with the database
         return Response.status(Response.Status.OK).entity(

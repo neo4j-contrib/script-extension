@@ -6,25 +6,17 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.kernel.ImpermanentGraphDatabase;
-import org.neo4j.server.rest.repr.OutputFormat;
-import org.neo4j.server.rest.repr.formats.JsonFormat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.Iterator;
 import java.util.Map;
 
 //curl -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"script" : "42"}' http://localhost:7474/db/data/ext/RubyPlugin/graphdb/execute_script
 
-
 /**
- * Created by IntelliJ IDEA.
- * User: andreas
- * Date: 5/10/11
- * Time: 9:41 AM
- * To change this template use File | Settings | File Templates.
+ * @author andreas
+ * @since 5/10/11
  */
 public class JRubyTest extends TestCase {
 
@@ -45,12 +37,9 @@ public class JRubyTest extends TestCase {
         System.out.println("It works");
         Map<String,String> env = System.getenv();
 
-        StringBuffer buf = new StringBuffer();
-         Iterator iter = env.entrySet().iterator();
-    while (iter.hasNext()) {
-        buf.append(iter.next().toString());
-      System.out.println(iter.next());
-    }
+        for (Map.Entry<String, String> entry : env.entrySet()) {
+            System.out.println(entry);
+        }
 
         neo4j = new ImpermanentGraphDatabase("target/db");
 
