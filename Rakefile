@@ -23,3 +23,11 @@ end
 
 desc "Compile, copy jar and restart server"
 task :all => [:compile, :copy_plugin, :restart]
+
+
+desc "Run all specs"
+RSpec::Core::RakeTask.new("spec") do |t|
+#  t.rcov = true
+#  t.rcov_opts = %w{--rails --include views -Ispec --exclude gems\/,spec\/,features\/,seeds\/}
+  t.rspec_opts = ["-f d -c"]
+end
