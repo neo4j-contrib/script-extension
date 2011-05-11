@@ -1,5 +1,6 @@
 package org.neo4j.server.extension.script;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.ScriptingContainer;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -101,11 +102,14 @@ public class JRubyResource {
                 (result.toString()).getBytes()).build();
     }
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/eval2")
-    public Response eval2(@Context ScriptingContainer container, String input) {
+    public Response eval2(@Context ScriptingContainer container, InputStream input) throws IOException {
 
-        Object result = container.runScriptlet(input);
+        final String script = new ObjectMapper().<String>readValue(input, String.class);
+        System.out.println("script = " + script);
+        Object result = container.runScriptlet(script);
 
         // Do stuff with the database
         return Response.status(Response.Status.OK).entity(
@@ -189,7 +193,7 @@ public class JRubyResource {
     // DEBUG ----------------------------
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    @Path("/")
+    @Path("/status")
     public Response status() {
 
         Map<String, String> env = System.getenv();

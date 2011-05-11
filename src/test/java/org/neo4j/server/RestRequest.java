@@ -71,9 +71,12 @@ public class RestRequest {
     }
 
     public ClientResponse post( String path, String data ) {
+        return post(path,data,MediaType.APPLICATION_JSON_TYPE);
+    }
+    public ClientResponse post( String path, String data, MediaType mediaType ) {
         Builder builder = builder( path );
         if ( data != null ) {
-            builder = builder.entity( data, MediaType.APPLICATION_JSON_TYPE );
+            builder = builder.entity( data, mediaType );
         }
         return builder.post( ClientResponse.class );
     }

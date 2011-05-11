@@ -31,6 +31,7 @@ public class JRubyExtensionInitializer implements PluginLifecycle {
         ScriptingContainer container = new ScriptingContainer(LocalContextScope.CONCURRENT);
         container.setHomeDirectory(jrubyHome);   // needs for "require 'rubygems'"
         container.put("$NEO4J_SERVER", gds);
+//        container.runScriptlet("Neo4j.start(nil, $NEO_SERVER)");
         return loadGems(container, gemFile);
     }
 
@@ -42,7 +43,7 @@ public class JRubyExtensionInitializer implements PluginLifecycle {
             container.runScriptlet("require 'bundler/setup'");
             container.runScriptlet("Bundler.require");
         }
-        container.runScriptlet("require 'neo4j'");
+        // container.runScriptlet("require 'neo4j'");
         return container;
     }
 
