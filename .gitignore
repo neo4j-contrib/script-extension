@@ -3,7 +3,10 @@ nbproject
 
 # ignore Rubymine
 .idea
-
+*.ipr
+*.iml
+*.iws
+target
 .rvmrc
 .bundle
 tmp
