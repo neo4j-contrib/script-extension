@@ -14,22 +14,7 @@ module Neo4jServer
     def upload_gemfile(file_location)
       file = File.read(file_location)
       res = Net::HTTP.start(@server_url.host, @server_url.port) do |http|
-        http.post('/jruby/gemfile', file)
-      end
-      [res.code, res.body]
-    end
-
-
-    def install
-      res = Net::HTTP.start(@server_url.host, @server_url.port) do |http|
-        http.get('/jruby/install')
-      end
-      [res.code, res.body]
-    end
-    def upload_script(file_location)
-      file = File.read(file_location)
-      res = Net::HTTP.start(@server_url.host, @server_url.port) do |http|
-        http.post('/jruby/script', file)
+        http.post('/script/jruby/gemfile', file)
       end
       [res.code, res.body]
     end
@@ -37,7 +22,7 @@ module Neo4jServer
 
     def eval(s)
       res = Net::HTTP.start(@server_url.host, @server_url.port) do |http|
-        http.post('/jruby/eval', s)
+        http.post('/script/jruby/eval', s)
       end
       [res.code, res.body]
     end

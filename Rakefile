@@ -2,9 +2,18 @@ require 'rake'
 require 'rspec/core/rake_task'
 
 NEO4J_SERVER = "/home/andreas/software/neo4j/neo4j"
-JAR_FILE = "script-extension-jruby-0.1-SNAPSHOT.jar"
+JAR_FILE = "target/script-extension-jruby-0.1-SNAPSHOT.jar"
 
 task :default => [:all]
+
+desc "Config server"
+task :install do
+  # create a folder where the Gemfile are stored
+  system "mkdir -p #{NEO4J_SERVER}/jruby" 
+
+  # install the configuration for the server
+  system "cp config/neo4j-server.properties #{NEO4J_SERVER}/conf" 
+end
 
 desc "Compile"
 task :compile do
@@ -27,7 +36,5 @@ task :all => [:compile, :copy_plugin, :restart]
 
 desc "Run all specs"
 RSpec::Core::RakeTask.new("spec") do |t|
-#  t.rcov = true
-#  t.rcov_opts = %w{--rails --include views -Ispec --exclude gems\/,spec\/,features\/,seeds\/}
   t.rspec_opts = ["-f d -c"]
 end

@@ -43,8 +43,8 @@ public class JRubyExtensionServerTest {
     }
 
     @Test
-    public void testEval2() throws Exception {
-        final ClientResponse response = request.post("eval2", "$NEO4J_SERVER.getReferenceNode().getId()");
+    public void testEval() throws Exception {
+        final ClientResponse response = request.post("eval", "$NEO4J_SERVER.getReferenceNode().getId()");
         final String result = response.getEntity(String.class);
         System.out.println(result);
         Assert.assertEquals(server.getGraphDatabase().getReferenceNode().getId(), Long.parseLong(result));

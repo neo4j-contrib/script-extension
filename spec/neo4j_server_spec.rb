@@ -18,5 +18,16 @@ describe Neo4jServer do
       File.exist?("#{NEO4J_SERVER}/jruby/Gemfile").should be_true
       FileUtils.cmp('spec/fixture/Gemfile', "#{NEO4J_SERVER}/jruby/Gemfile").should be_true
     end
+
+    it "install the correct Gems according to the Gemfile" do
+      # when
+      code = Neo4jServer.upload_gemfile('spec/fixture/Gemfile')
+
+      code, body = Neo4jServer.eval "(defined? JSON)? 'YES' : 'NO'"
+      puts "BODY = #{body}"
+      code.should == '200'
+    end
+
+    
   end
 end
