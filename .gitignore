@@ -1,0 +1,15 @@
+# ignore netbeans specific stuff
+nbproject
+
+# ignore Rubymine
+.idea
+
+.rvmrc
+.bundle
+tmp
+
+# jedit
+*~
+
+# vim
+.*.sw[a-z]
