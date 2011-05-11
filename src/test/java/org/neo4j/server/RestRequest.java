@@ -20,6 +20,7 @@ import java.util.Map;
 public class RestRequest {
     private final URI baseUri;
     private final Client client;
+    private MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;
 
     public RestRequest( URI baseUri ) {
         this( baseUri, null, null );
@@ -30,6 +31,10 @@ public class RestRequest {
         client = Client.create();
         if ( username != null ) client.addFilter( new HTTPBasicAuthFilter( username, password ) );
 
+    }
+
+    public void setMediaType(MediaType mediaType) {
+        this.mediaType = mediaType;
     }
 
     private RestRequest( URI uri, Client client ) {
@@ -54,7 +59,7 @@ public class RestRequest {
 
     private Builder builder( String path ) {
         WebResource resource = client.resource( uri( pathOrAbsolute( path ) ) );
-        return resource.accept( MediaType.APPLICATION_JSON_TYPE );
+        return resource.accept( mediaType );
     }
 
     private String pathOrAbsolute( String path ) {
@@ -71,7 +76,7 @@ public class RestRequest {
     }
 
     public ClientResponse post( String path, String data ) {
-        return post(path,data,MediaType.APPLICATION_JSON_TYPE);
+        return post(path,data,mediaType);
     }
     public ClientResponse post( String path, String data, MediaType mediaType ) {
         Builder builder = builder( path );

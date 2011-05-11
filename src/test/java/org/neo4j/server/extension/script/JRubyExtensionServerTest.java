@@ -7,6 +7,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.server.LocalTestServer;
 import org.neo4j.server.RestRequest;
 
+import javax.ws.rs.core.MediaType;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -25,6 +26,7 @@ public class JRubyExtensionServerTest {
     public static void startServer() throws URISyntaxException {
         server.start();
         request = new RestRequest(new URI(URI));
+        request.setMediaType(MediaType.TEXT_PLAIN_TYPE);
     }
     @AfterClass
     public static void stopServer() {
@@ -42,7 +44,7 @@ public class JRubyExtensionServerTest {
 
     @Test
     public void testEval2() throws Exception {
-        final ClientResponse response = request.post("eval2", "\"$NEO4J_SERVER.getReferenceNode().getId()\"");
+        final ClientResponse response = request.post("eval2", "$NEO4J_SERVER.getReferenceNode().getId()");
         final String result = response.getEntity(String.class);
         System.out.println(result);
         Assert.assertEquals(server.getGraphDatabase().getReferenceNode().getId(), Long.parseLong(result));
