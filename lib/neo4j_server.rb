@@ -19,7 +19,13 @@ module Neo4jServer
       [res.code, res.body]
     end
 
-
+    def delete_gemfile
+      res = Net::HTTP.start(@server_url.host, @server_url.port) do |http|
+        http.delete('/script/jruby/gemfile')
+      end
+      res.code
+    end
+   
     def eval(s)
       res = Net::HTTP.start(@server_url.host, @server_url.port) do |http|
         http.post('/script/jruby/eval', s)

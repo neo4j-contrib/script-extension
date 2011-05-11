@@ -29,6 +29,7 @@ public class Gemfile {
         container.runScriptlet("require 'rubygems'");
         container.runScriptlet("ENV['BUNDLE_GEMFILE'] = \"" + gemFile.toString() + "\"");
         container.runScriptlet("require 'bundler/setup'");
+        // TODO not sure if we should require all the gems. Maybe we want to unload them first
         container.runScriptlet("Bundler.require");
     }
 
@@ -46,9 +47,21 @@ public class Gemfile {
     }
 
 
-    public static boolean hasGemfileInGraphDb(GraphDatabaseService gds) {
+    public static boolean existOnFile() {
+        return getFile().exists();
+    }
+
+    public static boolean existInGraphDb(GraphDatabaseService gds) {
         return gds.getReferenceNode().hasProperty("gemFile");
     }
+
+    public static void deleteFile() {
+        getFile().delete();
+        if (getLockFile().exists()) {
+            getLockFile().delete();
+        }
+    }
+
 
     public static Gemfile createFileFromGraphDb(GraphDatabaseService gds) {
         String gemfile = (String) gds.getReferenceNode().getProperty("gemFile");
@@ -66,8 +79,23 @@ public class Gemfile {
         tx.finish();
     }
 
+    public static void deleteInGraphDb(GraphDatabaseService gds) throws IOException {
+        Transaction tx = gds.beginTx();
+        gds.getReferenceNode().removeProperty("gemFile");
+        tx.success();
+        tx.finish();
+    }
+
+    private static File getFile() {
+        return new File(directory(), "Gemfile");
+    }
+
+    private static File getLockFile() {
+        return new File(directory(), "Gemfile.lock");
+    }
+
     private static File createGemFile(String is) throws IOException {
-        File gemFile = new File(directory(), "Gemfile");
+        File gemFile = getFile();
         writeFile(is, gemFile);
         return gemFile;
     }

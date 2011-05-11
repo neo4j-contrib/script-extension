@@ -27,11 +27,24 @@ end
 
 desc "Restart"
 task :restart do
+  Dir.chdir NEO4J_SERVER
   system "#{NEO4J_SERVER}/bin/neo4j restart"
 end
 
+desc "Stop"
+task :stop do
+  Dir.chdir NEO4J_SERVER
+  system "#{NEO4J_SERVER}/bin/neo4j stop"
+end
+
+desc "Start"
+task :start do
+  Dir.chdir NEO4J_SERVER
+  system "cd #{NEO4J_SERVER}/bin; ./neo4j start"
+end
+
 desc "Compile, copy jar and restart server"
-task :all => [:compile, :copy_plugin, :restart]
+task :all => [:compile, :copy_plugin] 
 
 
 desc "Run all specs"
