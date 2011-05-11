@@ -1,4 +1,4 @@
-package org.neo4j.server.scriptextension;
+package org.neo4j.server.extension.script;
 
 import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.ScriptingContainer;

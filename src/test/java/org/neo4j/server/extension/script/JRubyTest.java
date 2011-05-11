@@ -1,4 +1,4 @@
-package org.neo4j.server.plugin.gremlin;
+package org.neo4j.server.extension.script;
 
 import junit.framework.TestCase;
 import org.jruby.embed.ScriptingContainer;
