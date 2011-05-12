@@ -28,6 +28,7 @@ public class Gemfile {
 
         container.runScriptlet("require 'rubygems'");
         container.runScriptlet("ENV['BUNDLE_GEMFILE'] = \"" + gemFile.toString() + "\"");
+        container.runScriptlet("Dir.chdir('" + directory() + "'); system 'bundle install'" );
         container.runScriptlet("require 'bundler/setup'");
         // TODO not sure if we should require all the gems. Maybe we want to unload them first
         container.runScriptlet("Bundler.require");
