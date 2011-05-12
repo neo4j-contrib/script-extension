@@ -1,4 +1,3 @@
-#require 'rubygems'
 require 'net/http'
 
 module Neo4jServer
@@ -41,3 +40,4 @@ module Neo4jServer
   extend ClassMethods
 
 end
+

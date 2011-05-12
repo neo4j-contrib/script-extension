@@ -35,7 +35,6 @@ public class JRubyExtensionInitializer implements PluginLifecycle {
         logger.info("set jrubyHome = '" + jrubyHome + "'");
         container.setHomeDirectory(jrubyHome);   // needs for "require 'rubygems'"
         container.put("$NEO4J_SERVER", gds);
-//        container.runScriptlet("Neo4j.start(nil, $NEO_SERVER)");
         if (Gemfile.existInGraphDb(gds)) {
             logger.info("gemfile stored in graph db, create file");
             Gemfile gemfile = Gemfile.createFileFromGraphDb(gds);

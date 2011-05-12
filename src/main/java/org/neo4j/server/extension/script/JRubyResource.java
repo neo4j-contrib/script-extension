@@ -40,6 +40,8 @@ public class JRubyResource {
         logger.info("Load gems");
         gemfile.loadGems(container);
 
+        container.put("$NEO4J_SERVER", database); // looks like the initialization is not always run ???
+
         logger.info("Initialized all gems");
         return Response.status(Response.Status.OK).entity((
                 "created at: " + gemfile.getGemFile().toString()).getBytes()).build();
@@ -64,7 +66,10 @@ public class JRubyResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/eval")
     public Response eval(@Context ScriptingContainer container, String script) throws IOException {
-        logger.info("Eval " + script);
+        logger.info("Eval: '" + script + "'");
+
+        container.put("$NEO4J_SERVER", database); // looks like the initialization is not always run ???
+
         Object result = container.runScriptlet(script);
         if (result == null) {
             result = "";
