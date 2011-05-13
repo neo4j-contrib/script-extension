@@ -21,29 +21,13 @@ public class JRubyExtensionInitializer implements PluginLifecycle {
      */
     @Override
     public Collection<Injectable<?>> start( GraphDatabaseService gds, Configuration config ) {
-        // steps, init scripting container, load gemfiles, run bundler
-        System.out.println("START " + JRubyExtensionInitializer.class.toString());
         logger.info("START " + JRubyExtensionInitializer.class.toString());
         final String jrubyHome = config.getString("org.neo4j.server.extension.scripting.jruby");
-        logger.info("jrubyHome = "  + jrubyHome);
-        ScriptingContainer container = setupContainer(jrubyHome, gds);
-        return Arrays.<Injectable<?>>asList(new ScriptExtensionInjectable<ScriptingContainer>(container));
+        RestartableScriptContainer container = new RestartableScriptContainer(jrubyHome, gds);
+        container.loadGemsFromGraphDb(gds);
+        return Arrays.<Injectable<?>>asList(new ScriptExtensionInjectable<RestartableScriptContainer>(container));
     }
 
-    private ScriptingContainer setupContainer(String jrubyHome, GraphDatabaseService gds) {
-        ScriptingContainer container = new ScriptingContainer(LocalContextScope.CONCURRENT);
-        logger.info("set jrubyHome = '" + jrubyHome + "'");
-        container.setHomeDirectory(jrubyHome);   // needs for "require 'rubygems'"
-        container.put("$NEO4J_SERVER", gds);
-        if (Gemfile.existInGraphDb(gds)) {
-            logger.info("gemfile stored in graph db, create file");
-            Gemfile gemfile = Gemfile.createFileFromGraphDb(gds);
-            gemfile.loadGems(container);
-        } else {
-            logger.info("No gemfile stored in graph db");
-        }
-        return container;
-    }
 
     public void stop() {
     }

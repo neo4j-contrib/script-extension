@@ -26,7 +26,10 @@ public class JRubyResource {
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/gemfile")
-    public Response createGemfile(@Context ScriptingContainer container, String txt) throws IOException {
+    public Response createGemfile(@Context RestartableScriptContainer container, String txt) throws IOException {
+        System.out.println("Create new Gemfile");
+        logger.info("NEW GEMFILE");
+        container.restart(database);
 
         // First store the new gemfile in the graph db
         logger.info("Store new gemfile in db");
@@ -49,7 +52,7 @@ public class JRubyResource {
 
     @DELETE
     @Path("/gemfile")
-    public Response deleteGemfile(@Context ScriptingContainer container, String txt) throws IOException {
+    public Response deleteGemfile(@Context RestartableScriptContainer container, String txt) throws IOException {
         if (Gemfile.existOnFile()) {
             logger.info("Delete gemfile on filesystem");
             Gemfile.deleteFile();
@@ -65,16 +68,12 @@ public class JRubyResource {
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/eval")
-    public Response eval(@Context ScriptingContainer container, String script) throws IOException {
+    public Response eval(@Context RestartableScriptContainer container, String script) throws IOException {
         logger.info("Eval: '" + script + "'");
 
         container.put("$NEO4J_SERVER", database); // looks like the initialization is not always run ???
 
         Object result = container.runScriptlet(script);
-        if (result == null) {
-            result = "";
-        }
-        // Do stuff with the database
         return Response.status(Response.Status.OK).entity(
                 (result.toString()).getBytes()).build();
     }
@@ -84,7 +83,7 @@ public class JRubyResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/status")
-    public Response status(@Context ScriptingContainer container) {
+    public Response status(@Context RestartableScriptContainer container) {
 
         Map<String, String> env = System.getenv();
 

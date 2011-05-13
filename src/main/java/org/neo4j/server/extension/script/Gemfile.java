@@ -23,7 +23,7 @@ public class Gemfile {
         return gemFile;
     }
 
-    public void loadGems(ScriptingContainer container) {
+    public void loadGems(RestartableScriptContainer container) {
         // tell jruby where the Gemfile is located.
 
         container.runScriptlet("require 'rubygems'");
