@@ -78,6 +78,24 @@ public class JRubyResource {
                 (result.toString()).getBytes()).build();
     }
 
+    @POST
+    @Path("/call")
+    public Response getEmployeeLastName(@Context RestartableScriptContainer container, @QueryParam("classandmethod") String classandmethod, String params) {
+        logger.info("Call: '" + classandmethod + "'");
+        logger.info("Params '" + params + "'");
+        container.put("$NEO4J_SERVER", database); // looks like the initialization is not always run ???
+
+        container.put("params", params); // looks like the initialization is not always run ???
+        String[] s = classandmethod.split("\\.");  //(classandmethod.indexOf('.'))
+        String rubyclass = s[0];
+        String rubymethod = s[1];
+        String script = rubyclass + ".send(:" + rubymethod + ", params)";
+        logger.info("Call '" + script + "'");
+        Object result = container.runScriptlet(script);
+        return Response.status(Response.Status.OK).entity(
+                (result.toString()).getBytes()).build();
+
+    }
 
     // DEBUG ----------------------------
     @GET

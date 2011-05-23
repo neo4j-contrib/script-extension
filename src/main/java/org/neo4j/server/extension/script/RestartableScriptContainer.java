@@ -42,7 +42,7 @@ public class RestartableScriptContainer {
 
     public void start(GraphDatabaseService gds) {
         if (container != null)
-            throw new RuntimeException("Already runnig");
+            throw new RuntimeException("Already running");
 
         container = new ScriptingContainer(LocalContextScope.SINGLETHREAD); // LocalContextScope.CONCURRENT
         logger.info("Create new CONTAINER - set jrubyHome = '" + getRubyHome() + "'");
