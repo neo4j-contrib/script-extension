@@ -7,8 +7,10 @@ import org.neo4j.server.logging.Logger;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.*;
+import java.util.List;
 import java.util.Map;
 
 
@@ -79,22 +81,46 @@ public class JRubyResource {
     }
 
     @POST
+    @Consumes("application/x-www-form-urlencoded")
     @Path("/call")
-    public Response getEmployeeLastName(@Context RestartableScriptContainer container, @QueryParam("classandmethod") String classandmethod, String params) {
-        logger.info("Call: '" + classandmethod + "'");
-        logger.info("Params '" + params + "'");
-        container.put("$NEO4J_SERVER", database); // looks like the initialization is not always run ???
+    public Response call(@Context RestartableScriptContainer container, MultivaluedMap<String, String> formParams) {
+        logger.info("Call2");
+        try {
+            for (String key : formParams.keySet()) {
+                logger.info("Key '" + key + "' value: '" + formParams.getFirst(key) + "'");
+            }
+            String rubyclass = formParams.getFirst("class");
+            String rubymethod = formParams.getFirst("method");
+            String nbrArgs  = formParams.getFirst("args");
+            logger.info("Call class: '" + rubyclass + "' method: '" + rubymethod + "' #args: " + nbrArgs);
+            container.put("$NEO4J_SERVER", database); // looks like the initialization is not always run ???
 
-        container.put("params", params); // looks like the initialization is not always run ???
-        String[] s = classandmethod.split("\\.");  //(classandmethod.indexOf('.'))
-        String rubyclass = s[0];
-        String rubymethod = s[1];
-        String script = rubyclass + ".send(:" + rubymethod + ", params)";
-        logger.info("Call '" + script + "'");
-        Object result = container.runScriptlet(script);
-        return Response.status(Response.Status.OK).entity(
-                (result.toString()).getBytes()).build();
+            int size = Integer.parseInt(nbrArgs);
 
+            // Isn't java painful :(
+            StringBuffer script = new StringBuffer();
+            script.append(rubyclass + ".send(:" + rubymethod);
+            if (size > 0)
+                script.append(",");
+
+            for (int i = 0; i < size; i++) {
+                String argName = "arg" + i;
+                logger.info("Set '" + argName + "' = '" + formParams.get(argName) + "'");
+                container.put(argName, formParams.getFirst(argName));
+                script.append(argName);
+                if (i < size - 1)
+                    script.append(",");
+            }
+            script.append(")");
+            logger.info("Call '" + script.toString() + "'");
+            Object result = container.runScriptlet(script.toString());
+            return Response.status(Response.Status.OK).entity(
+                    (result.toString()).getBytes()).build();
+        } catch (Exception e) {
+            logger.error("Can't call");
+            logger.error(e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // DEBUG ----------------------------
