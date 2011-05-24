@@ -1,30 +1,30 @@
 Neo4j - JRuby Server Extension
 ===============================
 
-You need to install the (unreleased neo4j.rb 1.1.0.beta.4)
-
 Installation
 ------------
 
 1. create a folder in your server home folder, named jruby
 
-2. add a Gemfile in this folder
+2. goto the (this) bin directory and run the neo4j-server shell script.
+That script will upload and install the Gemfile (bin/Gemfile)
 
-```
-gem 'json'
-gem 'twitter'
-gem 'neo4j', '1.1.0.beta.4'  # Unlreased !!!
-```
+You also install a gemfile by POSTing to http://localhost:7474/script/jruby/install
 
-Now you can install those gems in the server
 
-    curl http://localhost:7474/jruby/install
+Eval:
+----
 
-Example:
--------
+You can eval a ruby script
 
-    curl -d "class Person < Neo4j::Rails::Model; end; 42" http://localhost:7474/jruby
-    curl -d "Person.create(:name => 'kalle')" http://localhost:7474/jruby
-    curl -d "Neo4j.ref_node.rels.size" http://localhost:7474/jruby
+    curl -d "class Person < Neo4j::Rails::Model; end; 42" http://localhost:7474/script/jruby/eval
+    curl -d "Person.create(:name => 'kalle')" http://localhost:7474/script/jruby/eval
+    curl -d "Neo4j.ref_node.rels.size" http://localhost:7474/script/jruby/eval
 
-Currently the script must not return a nil value or it will crash
+
+Call Ruby Method
+----------------
+
+You can execute a method in a class by posting a form with the parameter class, method and arg0, arg1, arg2... and args to the number of argument.
+
+http://localhost:7474/script/jruby/call
