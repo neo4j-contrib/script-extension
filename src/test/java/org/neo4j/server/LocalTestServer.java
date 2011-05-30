@@ -74,7 +74,7 @@ public class LocalTestServer {
                 return hostname;
             }
         };
-        neoServer = new NeoServerWithEmbeddedWebServer(bootstrapper,new StartupHealthCheck(),new PropertyFileConfigurator(new File(url.getPath())),new Jetty6WebServer(),serverModules) {
+        neoServer = new NeoServerWithEmbeddedWebServer(bootstrapper,addressResolver,new StartupHealthCheck(),new PropertyFileConfigurator(new File(url.getPath())),new Jetty6WebServer(),serverModules) {
             @Override
             protected int getWebServerPort() {
                 return port;
