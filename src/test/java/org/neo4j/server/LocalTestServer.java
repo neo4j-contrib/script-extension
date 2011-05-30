@@ -4,6 +4,7 @@ import org.apache.commons.configuration.Configuration;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.kernel.ImpermanentGraphDatabase;
+import org.neo4j.server.configuration.PropertyFileConfigurator;
 import org.neo4j.server.database.Database;
 import org.neo4j.server.database.GraphDatabaseFactory;
 import org.neo4j.server.modules.RESTApiModule;
@@ -73,8 +74,7 @@ public class LocalTestServer {
                 return hostname;
             }
         };
-        neoServer = new NeoServerWithEmbeddedWebServer(bootstrapper
-        , addressResolver, new StartupHealthCheck(), new File(url.getPath()), new Jetty6WebServer(), serverModules) {
+        neoServer = new NeoServerWithEmbeddedWebServer(bootstrapper,new StartupHealthCheck(),new PropertyFileConfigurator(new File(url.getPath())),new Jetty6WebServer(),serverModules) {
             @Override
             protected int getWebServerPort() {
                 return port;

@@ -1,7 +1,7 @@
 package org.neo4j.server.extension.script;
 
 import org.jruby.embed.LocalContextScope;
-    import org.jruby.embed.ScriptingContainer;
+import org.jruby.embed.ScriptingContainer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.server.logging.Logger;
 
