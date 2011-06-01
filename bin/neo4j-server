@@ -11,16 +11,24 @@ options.gemfile = "Gemfile"
 
 OptionParser.new do |opts|
   opts.banner = "Usage: neo4j-server [options]"
-
+  opts.separator ""
+  
   opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
+    puts v
     options.verbose = v
   end
 
-  opts.on("-u", "Specify the server URL") do |v|
+  opts.on("-u", "--url [URL]", "Specify the server URL") do |v|
+puts v
     options.url = v 
   end
 
-  opts.on("-f", "Specify the gemfile to install") do |v|
+  opts.on("-e","--eval [CODE]", "Specify the ruby code to evaluate") do |v|
+puts v
+    options.eval = v 
+  end
+
+  opts.on("-f","--file [FILE]", "Specify the gemfile to install") do |v|
     options.gemfile = v
   end
 
@@ -34,6 +42,9 @@ OptionParser.new do |opts|
 end.parse!
 
 Neo4jServer.server_url = options.url
-Neo4jServer.upload_gemfile(options.gemfile)
-
-puts "Uploaded gemfile #{options.gemfile}"
+if options.eval
+  puts Neo4jServer.eval(options.eval).inspect
+else
+  Neo4jServer.upload_gemfile(options.gemfile)
+  puts "Uploaded gemfile #{options.gemfile}"
+end
