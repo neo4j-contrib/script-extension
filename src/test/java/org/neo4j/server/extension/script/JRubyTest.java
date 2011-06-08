@@ -24,7 +24,7 @@ import org.jruby.embed.ScriptingContainer;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.neo4j.kernel.ImpermanentGraphDatabase;
+import org.neo4j.test.ImpermanentGraphDatabase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
