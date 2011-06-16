@@ -1,7 +1,8 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
-NEO4J_SERVER = "/home/andreas/software/neo4j/neo4j"
+GEMS_LOCATION="/Users/tbaum/Projekte/neo4j/hosting-extension/data/gems/Gemfile"
 
+# TODO integrate into maven-build, start neo4j-server
 
 
 describe Neo4jServer do
@@ -19,8 +20,8 @@ describe Neo4jServer do
       Neo4jServer.upload_gemfile('spec/fixture/Gemfile')
 
       # then 
-      File.exist?("#{NEO4J_SERVER}/jruby/Gemfile").should be_true
-      FileUtils.cmp('spec/fixture/Gemfile', "#{NEO4J_SERVER}/jruby/Gemfile").should be_true
+      File.exist?(GEMS_LOCATION).should be_true
+      FileUtils.cmp('spec/fixture/Gemfile', GEMS_LOCATION).should be_true
     end
 
     it "install the correct Gems according to the Gemfile" do

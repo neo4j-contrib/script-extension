@@ -20,63 +20,64 @@
 package org.neo4j.server.extension.script;
 
 import org.apache.commons.configuration.Configuration;
-import org.jruby.embed.LocalContextScope;
-import org.jruby.embed.ScriptingContainer;
+import org.mortbay.jetty.Server;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.AbstractGraphDatabase;
+import org.neo4j.server.NeoServer;
+import org.neo4j.server.NeoServerWithEmbeddedWebServer;
 import org.neo4j.server.logging.Logger;
 import org.neo4j.server.plugins.Injectable;
-import org.neo4j.server.plugins.PluginLifecycle;
+import org.neo4j.server.plugins.SPIPluginLifecycle;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class JRubyExtensionInitializer implements PluginLifecycle {
-    private static final Logger logger = new Logger(JRubyExtensionInitializer.class);
-    /**
-     * whatever is returned from this methos can be injected with @Context ParamType param in other resources
-     * @param gds
-     * @param config server config
-     * @return
-     */
-    @Override
-    public Collection<Injectable<?>> start( GraphDatabaseService gds, Configuration config ) {
-        logger.info("START " + JRubyExtensionInitializer.class.toString());
-        final String jrubyHome = config.getString("org.neo4j.server.extension.scripting.jruby");
-        RestartableScriptContainer container = new RestartableScriptContainer(jrubyHome, gds);
-        container.loadGemsFromGraphDb(gds);
-        return Arrays.<Injectable<?>>asList(new ScriptExtensionInjectable<RestartableScriptContainer>(container));
-    }
+import static org.neo4j.server.configuration.Configurator.THIRD_PARTY_PACKAGES_KEY;
+import static org.neo4j.server.extension.script.Util.locateGemHome;
+import static org.neo4j.server.plugins.TypedInjectable.injectable;
 
+public class JRubyExtensionInitializer implements SPIPluginLifecycle {
+
+    private static final Logger LOG = new Logger(JRubyExtensionInitializer.class);
+
+    @Override
+    public Collection<Injectable<?>> start(final GraphDatabaseService graphDatabaseService, final Configuration config) {
+        throw new IllegalAccessError();
+    }
 
     public void stop() {
     }
 
+    @Override
+    public Collection<Injectable<?>> start(final NeoServer neoServer) {
+        LOG.info("START " + JRubyExtensionInitializer.class.toString());
 
+        final Server jetty = getJetty(neoServer);
+        final AbstractGraphDatabase gds = neoServer.getDatabase().graph;
+        final Configuration configuration = neoServer.getConfiguration();
 
-    private static class ScriptExtensionInjectable<T> implements Injectable<T> {
+        final String gemHome = locateGemHome(configuration);
 
-        private final T value;
-        private final Class<? extends T> type;
-
-        public ScriptExtensionInjectable(T value) {
-            this(value, (Class<T>) value.getClass());
+        final JRubyRackContext ctx;
+        final EmbeddedRackApplicationFactory factory;
+        try {
+            factory = new EmbeddedRackApplicationFactory(gds, gemHome);
+            ctx = new JRubyRackContext("/rack", gds, configuration, factory);
+            jetty.addHandler(ctx);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        public ScriptExtensionInjectable(T value, Class<? extends T> type) {
-            this.value = value;
-            this.type = type;
-        }
-
-        @Override
-        public T getValue() {
-            return value;
-        }
-
-        @SuppressWarnings({"unchecked"})
-        @Override
-        public Class<T> getType() {
-            return (Class<T>) type;
-        }
+        return Arrays.<Injectable<?>>asList(injectable(ctx), injectable(factory));
     }
 
+    private Server getJetty(final NeoServer neoServer) {
+        if (neoServer instanceof NeoServerWithEmbeddedWebServer) {
+            final NeoServerWithEmbeddedWebServer server = (NeoServerWithEmbeddedWebServer) neoServer;
+            return server.getWebServer().getJetty();
+        } else {
+            throw new IllegalArgumentException("expected NeoServerWithEmbeddedWebServer");
+        }
+    }
 }

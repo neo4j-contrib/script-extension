@@ -1,0 +1,31 @@
+jruby-rack: Lifecycle:
+
+- startup factories
+- create jetty
+- register filter + servlet
+- register context-listener
+- @context-startup  RackApplication.init is called and the ruby-vm is started (runs config.ru)
+
+
+Ruby-Home: META-INFO/jruby.home from jruby-complete.jar is used to determine jruby-home-dir.
+files are loaded via java-resource-loader,  ATTENTION: when developing the source/resources dirs are invalid!
+
+
+
+org.neo4j.server.extension.script.JRubyExtensionInitializer
+ - wire up resources
+ - creates EmbeddedRackApplicationFactory and JRubyRackContext
+ - creates jersey-provider (injectables)
+
+org.neo4j.server.extension.script.EmbeddedRackApplicationFactory
+ - singleton-holder for the JRuby-Runtime
+ - prepare ruby-dependencies (bundler-gem, user-gemfile *)
+ - wire up Ruby-VM / GraphDatabaseService + Servlet-Context
+
+org.neo4j.server.extension.script.JRubyRackContext
+ - install ruby-rack context into jetty-context
+ - setup init-parameters like jruby-runtimes, confix.ru *
+
+
+config.ru + user-gemfile -> data is kept on the reference-node
+
