@@ -4,12 +4,19 @@ Neo4j - JRuby Server Extension
 Installation
 ------------
 
-1. create a folder in your server home folder, named jruby
+1. extract the script-extension-jruby-{version}-server-plugin.zip files into {NEO4J_HOME}/plugins
 
-2. goto the (this) bin directory and run the neo4j-server shell script.
-That script will upload and install the Gemfile (bin/Gemfile)
+2. add script-extension in {NEO4J_HOME}/conf/neo4j-server.properties through adding 
+   `org.neo4j.server.thirdparty_jaxrs_classes=org.neo4j.server.extension.script=/script`
 
-You also install a gemfile by POSTing to http://localhost:7474/script/jruby/install
+3. install your Gemfile and config.ru 
+
+````
+curl -XPOST --data-binary @Gemfile http://localhost:7474/script/jruby/gemfile
+curl -XPOST --data-binary @config.ru http://localhost:7474/script/jruby/config
+````
+
+4. the rack-application then should load at http://localhost:7474/rack
 
 
 Eval:
