@@ -32,10 +32,18 @@ import java.io.IOException;
 public class Util {
 // -------------------------- STATIC METHODS --------------------------
 
-    static String locateGemHome(final Configuration configuration) {
+    public static String locateGemHome(final Configuration configuration) {
+        return getConfig(configuration, "org.neo4j.server.extension.scripting.jruby.gemhome", "/../gems");
+    }
+
+    public static String locateRackHome(final Configuration configuration) {
+        return getConfig(configuration, "org.neo4j.server.extension.scripting.jruby.rackhome", "/../rack");
+    }
+
+    private static String getConfig(final Configuration configuration, final String key, final String s) {
         try {
-            final String configValue = configuration.getString("org.neo4j.server.extension.scripting.jruby.gemhome",
-                    configuration.getString(Configurator.DATABASE_LOCATION_PROPERTY_KEY) + "/../gems");
+            final String configValue = configuration.getString(key,
+                    configuration.getString(Configurator.DATABASE_LOCATION_PROPERTY_KEY) + s);
 
             return new File(configValue).getCanonicalPath();
         } catch (IOException e) {

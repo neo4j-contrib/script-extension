@@ -30,10 +30,12 @@ import org.neo4j.server.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Map;
 
+import static org.mortbay.resource.Resource.newResource;
 import static org.neo4j.helpers.collection.MapUtil.map;
+import static org.neo4j.server.extension.script.Util.locateGemHome;
+import static org.neo4j.server.extension.script.Util.locateRackHome;
 
 /**
  * @author tbaum
@@ -46,14 +48,16 @@ public class JRubyRackContext extends Context {
     private final ServerResource configRu;
     private final GraphDatabaseService gds;
     private final EmbeddedRackApplicationFactory factory;
+    private final Configuration configuration;
 
     public JRubyRackContext(String contextPath, GraphDatabaseService gds, Configuration configuration,
                             EmbeddedRackApplicationFactory factory) throws IOException {
         super(null, contextPath, false, false);
         this.gds = gds;
         this.factory = factory;
+        this.configuration = configuration;
 
-        final String gemHome = Util.locateGemHome(configuration);
+        final String gemHome = locateGemHome(configuration);
         configRu = new ServerResource(new File(gemHome, "config.ru"), "sinatra_config");
 
         setBaseResource();
@@ -84,8 +88,9 @@ public class JRubyRackContext extends Context {
     }
 
     private void setBaseResource() throws IOException {
-        final URL base = getClass().getResource("/");
-        setBaseResource(Resource.newResource(base));
+        final Resource base = newResource(locateRackHome(configuration));
+        LOG.info("setting base to " + base);
+        setBaseResource(base);
     }
 
     public ServerResource getConfigRu() {
