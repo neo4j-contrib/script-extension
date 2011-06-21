@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.server.extension.script;
+package org.neo4j.server.extension.script.resources;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author tbaum
  * @since 16.06.11 21:34
  */
-public class GemfileServerResource extends ServerResource {
+public class GemfileServerResource extends FileServerResource {
 
     public GemfileServerResource(File file, String property) {
         super(file, property);

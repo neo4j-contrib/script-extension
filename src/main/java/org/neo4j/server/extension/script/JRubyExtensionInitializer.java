@@ -22,7 +22,6 @@ package org.neo4j.server.extension.script;
 import org.apache.commons.configuration.Configuration;
 import org.mortbay.jetty.Server;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.NeoServerWithEmbeddedWebServer;
 import org.neo4j.server.logging.Logger;
@@ -33,7 +32,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.neo4j.server.configuration.Configurator.THIRD_PARTY_PACKAGES_KEY;
+import static org.neo4j.server.extension.script.Util.listMountPoints;
 import static org.neo4j.server.extension.script.Util.locateGemHome;
 import static org.neo4j.server.plugins.TypedInjectable.injectable;
 
@@ -54,22 +53,32 @@ public class JRubyExtensionInitializer implements SPIPluginLifecycle {
         LOG.info("START " + JRubyExtensionInitializer.class.toString());
 
         final Server jetty = getJetty(neoServer);
-        final AbstractGraphDatabase gds = neoServer.getDatabase().graph;
+        final GraphDatabaseService gds = neoServer.getDatabase().graph;
         final Configuration configuration = neoServer.getConfiguration();
 
         final String gemHome = locateGemHome(configuration);
 
-        final JRubyRackContext ctx;
         final EmbeddedRackApplicationFactory factory;
         try {
             factory = new EmbeddedRackApplicationFactory(gds, gemHome);
-            ctx = new JRubyRackContext("/rack", gds, configuration, factory);
-            jetty.addHandler(ctx);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        return Arrays.<Injectable<?>>asList(injectable(ctx), injectable(factory));
+        JRubyRackContextMap contextMap = new JRubyRackContextMap();
+
+        for (String mount : listMountPoints(configuration)) {
+            try {
+                LOG.info("creating jruby-endpoint at " + mount);
+                final JRubyRackContext context = new JRubyRackContext(mount, gds, configuration, factory);
+                contextMap.addEndpoint(mount, context);
+                jetty.addHandler(context);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return Arrays.<Injectable<?>>asList(injectable(contextMap), injectable(factory));
     }
 
     private Server getJetty(final NeoServer neoServer) {

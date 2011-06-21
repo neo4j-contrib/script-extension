@@ -16,7 +16,7 @@ curl -XPOST --data-binary @Gemfile http://localhost:7474/script/jruby/gemfile
 curl -XPOST --data-binary @config.ru http://localhost:7474/script/jruby/config
 ````
 
-4. the rack-application then should load at http://localhost:7474/rack
+4. the rack-application then should load at http://localhost:7474/dsr
 
 
 Eval:

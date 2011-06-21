@@ -24,20 +24,19 @@ import org.neo4j.server.configuration.Configurator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author tbaum
  * @since 16.06.11 21:03
  */
 public class Util {
-// -------------------------- STATIC METHODS --------------------------
+
+    public static final String CONFIG_BASE = "org.neo4j.server.extension.scripting.jruby";
 
     public static String locateGemHome(final Configuration configuration) {
-        return getConfig(configuration, "org.neo4j.server.extension.scripting.jruby.gemhome", "/../gems");
-    }
-
-    public static String locateRackHome(final Configuration configuration) {
-        return getConfig(configuration, "org.neo4j.server.extension.scripting.jruby.rackhome", "/../rack");
+        return getConfig(configuration, CONFIG_BASE + ".gemhome", "/../gems");
     }
 
     private static String getConfig(final Configuration configuration, final String key, final String s) {
@@ -49,5 +48,31 @@ public class Util {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String locateRackHome(final Configuration configuration) {
+        return getConfig(configuration, CONFIG_BASE + ".jruby.rackhome", "/../rack");
+    }
+
+    public static List<String> listMountPoints(final Configuration configuration) {
+        List<String> results = new ArrayList<String>();
+        String[] mounts = configuration.getStringArray(CONFIG_BASE + ".mountpoints");
+        for (String mount : mounts) {
+            mount = mount.trim();
+
+            if (!mount.startsWith("/")) {
+                mount = "/" + mount;
+            }
+
+            if (mount.endsWith("/")) {
+                mount = mount.substring(0, mount.length() - 1);
+            }
+
+            results.add(mount);
+        }
+        if (results.isEmpty()) {
+            results.add("/dsr");
+        }
+        return results;
     }
 }

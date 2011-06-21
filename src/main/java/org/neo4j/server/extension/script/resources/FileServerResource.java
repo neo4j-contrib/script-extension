@@ -17,56 +17,37 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.server.extension.script;
+package org.neo4j.server.extension.script.resources;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
 
 import java.io.*;
 
 /**
  * Represent a File and Property
  */
-public class ServerResource {
+public class FileServerResource extends ServerResource {
 
     private final File file;
-    private final String property;
 
-    public ServerResource(File file, String property) {
+    public FileServerResource(File file, String property) {
+        super(property);
         this.file = file;
-        this.property = property;
     }
 
     public File getFile() {
         return file;
     }
 
-    public void delete(GraphDatabaseService gds) throws IOException {
-        Transaction tx = gds.beginTx();
-        try {
-            gds.getReferenceNode().removeProperty(property);
-            tx.success();
-        } finally {
-            tx.finish();
-        }
+    @Override public void delete(final GraphDatabaseService gds) throws IOException {
+        super.delete(gds);
         if (file.exists()) {
             file.delete();
         }
     }
 
-    public boolean existInGraphDb(GraphDatabaseService gds) {
-        return gds.getReferenceNode().hasProperty(property);
-    }
-
-    public boolean store(String data, GraphDatabaseService gds) throws IOException {
-        Transaction tx = gds.beginTx();
-        try {
-            gds.getReferenceNode().setProperty(property, data);
-            tx.success();
-        } finally {
-            tx.finish();
-        }
-        return updateFileSystem(gds);
+    @Override public boolean store(final String data, final GraphDatabaseService gds) throws IOException {
+        return super.store(data, gds) && updateFileSystem(gds);
     }
 
     public boolean updateFileSystem(GraphDatabaseService gds) throws IOException {
@@ -81,7 +62,6 @@ public class ServerResource {
             }
 
             file.delete();
-
         }
 
         Writer os = new FileWriter(file);
@@ -100,13 +80,5 @@ public class ServerResource {
         }
 
         return sb.toString();
-    }
-
-    public String retrieve(final GraphDatabaseService gds) {
-        try {
-            return (String) gds.getReferenceNode().getProperty(property);
-        } catch (Exception e) {
-            return null;
-        }
     }
 }

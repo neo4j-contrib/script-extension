@@ -22,6 +22,7 @@ package org.neo4j.server.extension.script;
 import org.jruby.Ruby;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.server.extension.script.resources.ServerResource;
 import org.neo4j.server.logging.Logger;
 
 import javax.ws.rs.*;
@@ -82,8 +83,17 @@ public class JRubyResource {
     }
 
     @POST @Produces(TEXT_PLAIN) @Path("/config")
-    public Response createConfigFile(@Context JRubyRackContext container, String txt) throws IOException {
-        LOG.info("Create new config");
+    public Response createConfigFile(@Context JRubyRackContextMap cont, String txt) throws IOException {
+        final String singleEndpoint = cont.getSingleEndpointName();
+        return createConfigFile(cont, singleEndpoint, txt);
+    }
+
+    @POST @Produces(TEXT_PLAIN) @Path("/config/{endpoint}")
+    public Response createConfigFile(@Context JRubyRackContextMap cont, @PathParam("endpoint") String endpoint,
+                                     String txt) throws IOException {
+        LOG.info("Create new config for " + endpoint);
+
+        JRubyRackContext container = cont.getEndpoint("/" + endpoint);
 
         ServerResource res = container.getConfigRu();
         res.store(txt, database);
@@ -95,17 +105,27 @@ public class JRubyResource {
     }
 
     @POST @Produces(TEXT_PLAIN) @Path("/gemfile")
-    public Response createGemFile(@Context JRubyRackContext container,
-                                  @Context EmbeddedRackApplicationFactory f, String txt) throws IOException {
+    public Response createGemFile(@Context JRubyRackContextMap container, @Context EmbeddedRackApplicationFactory f,
+                                  String txt) throws IOException {
         LOG.info("Create new Gemfile");
-        GemfileServerResource gemFile = f.getGemFile();
+        ServerResource gemFile = f.getGemFile();
         gemFile.store(txt, database);
-        container.restart();
+        container.restartAll();
         return Response.status(OK).build();
     }
 
     @DELETE @Path("/config")
-    public Response deleteConfigFile(@Context JRubyRackContext container, String txt) throws IOException {
+    public Response deleteConfigFile(@Context JRubyRackContextMap cont, String txt) throws IOException {
+        final String singleEndpoint = cont.getSingleEndpointName();
+        return deleteConfigFile(cont, singleEndpoint, txt);
+    }
+
+    @DELETE @Path("/config/{endpoint}")
+    public Response deleteConfigFile(@Context JRubyRackContextMap cont, @PathParam("endpoint") String endpoint,
+                                     String txt) throws IOException {
+
+        JRubyRackContext container = cont.getEndpoint("/" + endpoint);
+
         ServerResource config = container.getConfigRu();
         config.delete(database);
         container.restart();
@@ -113,11 +133,11 @@ public class JRubyResource {
     }
 
     @DELETE @Path("/gemfile")
-    public Response deleteGemFile(@Context JRubyRackContext container,
-                                  @Context EmbeddedRackApplicationFactory f, String txt) throws IOException {
-        GemfileServerResource gemFile = f.getGemFile();
+    public Response deleteGemFile(@Context JRubyRackContextMap container, @Context EmbeddedRackApplicationFactory f,
+                                  String txt) throws IOException {
+        ServerResource gemFile = f.getGemFile();
         gemFile.delete(database);
-        container.restart();
+        container.restartAll();
         return Response.status(OK).build();
     }
 

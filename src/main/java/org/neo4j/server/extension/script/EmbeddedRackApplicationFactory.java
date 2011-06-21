@@ -28,6 +28,7 @@ import org.jruby.rack.RackContext;
 import org.jruby.rack.RackInitializationException;
 import org.jruby.util.collections.WeakHashSet;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.server.extension.script.resources.GemfileServerResource;
 import org.neo4j.server.logging.Logger;
 
 import java.io.File;
@@ -59,7 +60,7 @@ public class EmbeddedRackApplicationFactory extends DefaultRackApplicationFactor
         this.gds = gds;
         this.gemHome = gemHome;
         this.defaultConfig = createDefaultConfig();
-        this.gemFile = new GemfileServerResource(new File(gemHome, "GemFile"), "gemFile");
+        this.gemFile = new GemfileServerResource(new File(gemHome, "GemFile"), "jruby.gemFile");
     }
 
     private RubyInstanceConfig createDefaultConfig() {

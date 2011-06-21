@@ -24,8 +24,9 @@ import org.jruby.rack.*;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.FilterHolder;
-import org.mortbay.resource.Resource;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.server.extension.script.resources.FileServerResource;
+import org.neo4j.server.extension.script.resources.ServerResource;
 import org.neo4j.server.logging.Logger;
 
 import java.io.File;
@@ -58,9 +59,9 @@ public class JRubyRackContext extends Context {
         this.configuration = configuration;
 
         final String gemHome = locateGemHome(configuration);
-        configRu = new ServerResource(new File(gemHome, "config.ru"), "sinatra_config");
+        configRu = new FileServerResource(new File(gemHome, "config.ru"), "jruby" + contextPath.replaceAll("/", ".") + ".config_ru");
 
-        setBaseResource();
+        setBaseResource(contextPath);
 
         configureRackWebContext();
     }
@@ -72,7 +73,7 @@ public class JRubyRackContext extends Context {
 
         addEventListener(new RackServletContextListener() {
             @Override protected RackApplicationFactory newApplicationFactory(final RackConfig rackConfig) {
-                return new SharedRackApplicationFactory(JRubyRackContext.this.factory);
+                return new SharedRackApplicationFactory(factory);
             }
         });
     }
@@ -87,10 +88,14 @@ public class JRubyRackContext extends Context {
         setInitParams(params);
     }
 
-    private void setBaseResource() throws IOException {
-        final Resource base = newResource(locateRackHome(configuration));
-        LOG.info("setting base to " + base);
-        setBaseResource(base);
+    private void setBaseResource(String contextPath) throws IOException {
+        if (contextPath.startsWith("/")) {
+            contextPath = contextPath.substring(1);
+        }
+        final File file = new File(locateRackHome(configuration), contextPath);
+        file.mkdirs();
+        LOG.info("setting base to " + file);
+        setBaseResource(newResource(file.toURI().toURL()));
     }
 
     public ServerResource getConfigRu() {
