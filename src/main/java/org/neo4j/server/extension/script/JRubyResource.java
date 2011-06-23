@@ -93,8 +93,11 @@ public class JRubyResource {
                                      String txt) throws IOException {
         LOG.info("Create new config for " + endpoint);
 
-        JRubyRackContext container = cont.getEndpoint("/" + endpoint);
+        if (!endpoint.startsWith("/")) {
+            endpoint = "/" + endpoint;
+        }
 
+        JRubyRackContext container = cont.getEndpoint(endpoint);
         ServerResource res = container.getConfigRu();
         res.store(txt, database);
 
