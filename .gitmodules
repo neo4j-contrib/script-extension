@@ -1,0 +1,3 @@
+[submodule "example/backend/backend-example"]
+	path = example/backend/backend-example
+	url = git://github.com/tbaum/neo4j-backend-example.git

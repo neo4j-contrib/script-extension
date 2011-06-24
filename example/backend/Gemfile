@@ -1,0 +1,1 @@
+gem 'backend-example', '0.0.2',  :git => "git://github.com/tbaum/neo4j-backend-example.git"
