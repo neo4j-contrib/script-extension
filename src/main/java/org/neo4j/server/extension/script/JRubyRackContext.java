@@ -31,6 +31,7 @@ import org.neo4j.server.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 
 import static org.mortbay.resource.Resource.newResource;
@@ -66,6 +67,16 @@ public class JRubyRackContext extends Context {
         configureRackWebContext();
     }
 
+    private void setBaseResource(String contextPath) throws IOException {
+        if (contextPath.startsWith("/")) {
+            contextPath = contextPath.substring(1);
+        }
+        final File file = new File(locateRackHome(configuration), contextPath);
+        file.mkdirs();
+        LOG.info("setting base to " + file);
+        setBaseResource(newResource(file.toURI().toURL()));
+    }
+
     private void configureRackWebContext() {
         setInitParams();
         addFilter(new FilterHolder(RackFilter.class), "/*", Handler.ALL);
@@ -88,18 +99,20 @@ public class JRubyRackContext extends Context {
         setInitParams(params);
     }
 
-    private void setBaseResource(String contextPath) throws IOException {
-        if (contextPath.startsWith("/")) {
-            contextPath = contextPath.substring(1);
+    private void updateConfigRu(final Map initParams) {
+        if (configRu.existInGraphDb(gds)) {
+            initParams.put("rackup", configRu.retrieve(gds));
+        } else {
+            initParams.remove("rackup");
         }
-        final File file = new File(locateRackHome(configuration), contextPath);
-        file.mkdirs();
-        LOG.info("setting base to " + file);
-        setBaseResource(newResource(file.toURI().toURL()));
     }
 
     public ServerResource getConfigRu() {
         return configRu;
+    }
+
+    public String getLog(Date since) {
+        return factory.getLog(since);
     }
 
     public void restart() {
@@ -118,14 +131,6 @@ public class JRubyRackContext extends Context {
             start();
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private void updateConfigRu(final Map initParams) {
-        if (configRu.existInGraphDb(gds)) {
-            initParams.put("rackup", configRu.retrieve(gds));
-        } else {
-            initParams.remove("rackup");
         }
     }
 }

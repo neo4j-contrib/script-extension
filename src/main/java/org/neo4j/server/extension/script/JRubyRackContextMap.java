@@ -19,6 +19,7 @@
  */
 package org.neo4j.server.extension.script;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +40,16 @@ public class JRubyRackContextMap {
             throw new IllegalArgumentException("endpoint " + endpoint + " not found");
         }
         return container;
+    }
+
+    public String getLogAll(Date since) {
+        StringBuilder result = new StringBuilder();
+        for (String s : ctx.keySet()) {
+            result.append(String.format("=== for %s\n", s));
+            result.append(ctx.get(s).getLog(since));
+            result.append("\n");
+        }
+        return result.toString();
     }
 
     public String getSingleEndpointName() {

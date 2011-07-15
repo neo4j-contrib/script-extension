@@ -33,7 +33,11 @@ import org.neo4j.server.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static java.lang.String.format;
 import static org.jruby.javasupport.JavaUtil.convertJavaToRuby;
@@ -54,6 +58,11 @@ public class EmbeddedRackApplicationFactory extends DefaultRackApplicationFactor
     private final String gemHome;
     private final GraphDatabaseService gds;
 
+    private final LogBufferOutputStream stderrLogger = new LogBufferOutputStream("E ");
+    private final LogBufferOutputStream stdoutLogger = new LogBufferOutputStream("  ");
+    private final PrintStream stderr = new PrintStream(stderrLogger);
+    private final PrintStream stdout = new PrintStream(stdoutLogger);
+
     private Ruby runtime;
 
     public EmbeddedRackApplicationFactory(final GraphDatabaseService gds, final String gemHome) throws IOException {
@@ -66,6 +75,8 @@ public class EmbeddedRackApplicationFactory extends DefaultRackApplicationFactor
     private RubyInstanceConfig createDefaultConfig() {
         RubyInstanceConfig config = new RubyInstanceConfig();
         config.setLoader(Thread.currentThread().getContextClassLoader());
+        config.setError(stderr);
+        config.setOutput(stdout);
         return config;
     }
 
@@ -99,9 +110,11 @@ public class EmbeddedRackApplicationFactory extends DefaultRackApplicationFactor
             }
             injectNeo4J();
 
-        } catch (RaiseException re) {
-            throw new RackInitializationException(re);
+        } catch (RaiseException e) {
+            e.printStackTrace(stderr);
+            throw new RackInitializationException(e);
         } catch (Exception e) {
+            e.printStackTrace(stderr);
             throw new RuntimeException(e);
         }
         return runtime;
@@ -155,6 +168,7 @@ public class EmbeddedRackApplicationFactory extends DefaultRackApplicationFactor
                     "require '%1$s'", gem));
 
         } catch (RaiseException e) {
+            e.printStackTrace(stderr);
             // recreate vm when gem was not installed
             runtime.tearDown(false);
             return createRuntime();
@@ -188,4 +202,18 @@ public class EmbeddedRackApplicationFactory extends DefaultRackApplicationFactor
             runtime = null;
         }
     }
+
+    public String getLog(Date since) {
+        SortedSet<LogBufferOutputStream.LogLine> lines = new TreeSet<LogBufferOutputStream.LogLine>();
+
+        lines.addAll(stderrLogger.getLogSince(since));
+        lines.addAll(stdoutLogger.getLogSince(since));
+
+        StringBuilder result = new StringBuilder();
+        for (LogBufferOutputStream.LogLine line : lines) {
+            result.append(line.toString()).append('\n');
+        }
+        return result.toString();
+    }
+
 }
