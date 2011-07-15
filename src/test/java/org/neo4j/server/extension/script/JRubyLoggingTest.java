@@ -126,9 +126,6 @@ public class JRubyLoggingTest {
         System.out.println("= script/jruby/log/" + now.getTime()  + "  ================================================");
         System.out.println(result6);
         response6.close();
-
-        System.in.read();
-
     }
 
 }
