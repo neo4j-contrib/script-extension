@@ -32,6 +32,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Date;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.OK;
@@ -184,7 +185,7 @@ public class JRubyResource {
         return Response.status(OK).entity((result.toString()).getBytes()).build();
     }
 
-    @GET @Path("/log")
+    @GET @Produces({TEXT_PLAIN, APPLICATION_JSON}) @Path("/log")
     public Response log(@Context JRubyRackContextMap cont) {
         final String singleEndpoint = cont.getSingleEndpointName();
         JRubyRackContext endpoint = cont.getEndpoint(singleEndpoint);
@@ -192,7 +193,7 @@ public class JRubyResource {
         return Response.status(OK).entity(endpoint.getLog(null)).build();
     }
 
-    @GET @Path("/log/{since}")
+    @GET @Produces({TEXT_PLAIN, APPLICATION_JSON}) @Path("/log/{since}")
     public Response log(@Context JRubyRackContextMap cont, @PathParam("since") long since) {
         final String singleEndpoint = cont.getSingleEndpointName();
         JRubyRackContext endpoint = cont.getEndpoint(singleEndpoint);
