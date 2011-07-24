@@ -37,7 +37,7 @@ import java.net.URISyntaxException;
 public class JRubyExtensionServerTest {
     private static final String HOSTNAME = "localhost";
     private static final int PORT = 7473;
-    public static final String URI = "http://" + HOSTNAME + ":" + PORT + "/script/jruby/";
+    public static final String URI = "http://" + HOSTNAME + ":" + PORT + "/script/";
     private static LocalTestServer server = new LocalTestServer(HOSTNAME,PORT).withPropertiesFile("test-db.properties");
     private static RestRequest request;
 

@@ -42,9 +42,7 @@ public class GemfileServerResource extends FileServerResource {
 
     @Override public boolean updateFileSystem(final GraphDatabaseService gds) throws IOException {
         final boolean changed = super.updateFileSystem(gds);
-        if (changed) {
-            new File(getFile().getCanonicalPath() + ".lock").delete();
-        }
+        new File(getFile().getCanonicalPath() + ".lock").delete();
         return changed;
     }
 }

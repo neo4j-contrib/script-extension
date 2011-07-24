@@ -61,7 +61,7 @@ public class JRubyLoggingTest {
     public void cleanup() {
         final GraphDatabaseService gds = server.getGraphDatabase();
         final Transaction tx = gds.beginTx();
-        gds.getReferenceNode().removeProperty("script/jruby/gemfile");
+        gds.getReferenceNode().removeProperty("script/gemfile");
         tx.success();
         tx.finish();
         server.cleanDb();
@@ -69,16 +69,16 @@ public class JRubyLoggingTest {
 
     @Test
     public void testEval() throws Exception {
-        final ClientResponse resp1 = request.put("script/jruby/gemfile", "" +
+        final ClientResponse resp1 = request.post("script/gemfile", "" +
                 "source :gemcutter\n" +
                 "gem 'sinatra'\n");
         final String result1 = resp1.getEntity(String.class);
-        System.out.println("= script/jruby/gemfile ================================================");
+        System.out.println("= script/gemfile ================================================");
         System.out.println(result1);
         resp1.close();
 
 
-        final ClientResponse resp2 = request.post("script/jruby/config", "" +
+        final ClientResponse resp2 = request.post("script/config", "" +
                 "require 'sinatra'\n" +
                 "class App < Sinatra::Base\n" +
                 "    get '/' do\n" +
@@ -93,9 +93,16 @@ public class JRubyLoggingTest {
                 "run App");
 
         String result2 = resp2.getEntity(String.class);
-        System.out.println("= script/jruby/config ================================================");
+        System.out.println("= script/config ================================================");
         System.out.println(result2);
         resp2.close();
+
+        final ClientResponse resp2a = request.post("script/restart", "");
+
+        String result2a = resp2a.getEntity(String.class);
+        System.out.println("= script/restart ================================================");
+        System.out.println(result2a);
+        resp2a.close();
 
 
         Date now = new Date();
@@ -106,9 +113,9 @@ public class JRubyLoggingTest {
         System.out.println(result3);
         response3.close();
 
-        final ClientResponse response4 = request.get("script/jruby/log/" + now.getTime());
+        final ClientResponse response4 = request.get("script/log/" + now.getTime());
         String result4 = response4.getEntity(String.class);
-        System.out.println("= script/jruby/log/" + now.getTime()  + "  ================================================");
+        System.out.println("= script/log/" + now.getTime() + "  ================================================");
         System.out.println(result4);
         response4.close();
 
@@ -121,9 +128,9 @@ public class JRubyLoggingTest {
         response5.close();
 
 
-        final ClientResponse response6 = request.get("script/jruby/log/" + now.getTime() );
+        final ClientResponse response6 = request.get("script/log/" + now.getTime());
         String result6 = response6.getEntity(String.class);
-        System.out.println("= script/jruby/log/" + now.getTime()  + "  ================================================");
+        System.out.println("= script/jruby/log/" + now.getTime() + "  ================================================");
         System.out.println(result6);
         response6.close();
     }

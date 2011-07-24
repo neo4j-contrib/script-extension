@@ -16,21 +16,21 @@ module Neo4jServer
     def upload_gemfile(file_location)
       file = File.read(file_location)
       res = Net::HTTP.start(server_url.host, server_url.port) do |http|
-        http.post('/script/jruby/gemfile', file)
+        http.post('/script/gemfile', file)
       end
       [res.code, res.body]
     end
 
     def delete_gemfile
       res = Net::HTTP.start(server_url.host, server_url.port) do |http|
-        http.delete('/script/jruby/gemfile')
+        http.delete('/script/gemfile')
       end
       res.code
     end
    
     def eval(s)
       res = Net::HTTP.start(server_url.host, server_url.port) do |http|
-        http.post('/script/jruby/eval', s)
+        http.post('/script/eval', s)
       end
       [res.code, res.body]
     end
