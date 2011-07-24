@@ -102,13 +102,14 @@ public class EmbeddedRackApplicationFactory extends DefaultRackApplicationFactor
         LOG.info("using gem-home: " + gemHome);
 
         try {
+            injectNeo4J();
+
             installBundler();
             installUserGemfile();
 
             if (rackContext != null) {
                 prepareServletEnv();
             }
-            injectNeo4J();
 
         } catch (RaiseException e) {
             e.printStackTrace(stderr);
