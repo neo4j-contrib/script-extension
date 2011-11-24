@@ -26,13 +26,17 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.server.LocalTestServer;
+import org.neo4j.server.NeoServerWithEmbeddedWebServer;
 import org.neo4j.server.RestRequest;
+import org.neo4j.server.helpers.ServerHelper;
 
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
+
+import static org.neo4j.server.helpers.ServerBuilder.server;
 
 /**
  * @author mh
@@ -42,11 +46,14 @@ public class JRubyLoggingTest {
     private static final String HOSTNAME = "localhost";
     private static final int PORT = 7473;
     public static final String URI = "http://" + HOSTNAME + ":" + PORT + "/";
-    private static LocalTestServer server = new LocalTestServer(HOSTNAME, PORT).withPropertiesFile("test-db.properties");
     private static RestRequest request;
 
+    private static NeoServerWithEmbeddedWebServer server;
+
     @BeforeClass
-    public static void startServer() throws URISyntaxException {
+    public static void startServer() throws URISyntaxException, IOException {
+        server = server().onPort(PORT).withThirdPartyJaxRsPackage("org.neo4j.server.extension.script", "/script").build();
+
         server.start();
         request = new RestRequest(new URI(URI));
         request.setMediaType(MediaType.TEXT_PLAIN_TYPE);
@@ -57,14 +64,15 @@ public class JRubyLoggingTest {
         server.stop();
     }
 
+
     @Before
-    public void cleanup() {
-        final GraphDatabaseService gds = server.getGraphDatabase();
+    public void cleanup() throws IOException {
+        final GraphDatabaseService gds = server.getDatabase().graph;
         final Transaction tx = gds.beginTx();
         gds.getReferenceNode().removeProperty("script/gemfile");
         tx.success();
         tx.finish();
-        server.cleanDb();
+        ServerHelper.cleanTheDatabase(server);
     }
 
     @Test

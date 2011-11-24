@@ -44,7 +44,7 @@ public class JRubyTest extends TestCase {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        neo4j = new ImpermanentGraphDatabase("target/db");
+        neo4j = new ImpermanentGraphDatabase();
     }
 
     @After
@@ -54,13 +54,13 @@ public class JRubyTest extends TestCase {
     @Test
     public void testNeoRuby() throws UnsupportedEncodingException {
         System.out.println("It works");
-        Map<String,String> env = System.getenv();
+        Map<String, String> env = System.getenv();
 
         for (Map.Entry<String, String> entry : env.entrySet()) {
             System.out.println(entry);
         }
 
-        neo4j = new ImpermanentGraphDatabase("target/db");
+        neo4j = new ImpermanentGraphDatabase();
 
         ScriptingContainer container = new ScriptingContainer();
         String script = "puts \"Neo: #{neo.class}\"; 42";

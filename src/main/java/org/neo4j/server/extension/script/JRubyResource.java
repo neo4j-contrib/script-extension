@@ -23,7 +23,6 @@ import org.jruby.Ruby;
 import org.jruby.internal.runtime.GlobalVariables;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.server.extension.script.resources.ServerResource;
 import org.neo4j.server.logging.Logger;
 
 import javax.ws.rs.*;
@@ -61,7 +60,7 @@ public class JRubyResource {
             String nbrArgs = formParams.getFirst("args");
             LOG.info("Call class: '" + rubyclass + "' method: '" + rubymethod + "' #args: " + nbrArgs);
             Ruby container = applicationFactory.getRuntime();
-            
+
             int size = Integer.parseInt(nbrArgs);
 
             StringBuilder script = new StringBuilder();
