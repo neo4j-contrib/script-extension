@@ -23,6 +23,7 @@ import org.jruby.Ruby;
 import org.jruby.internal.runtime.GlobalVariables;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.server.logging.Logger;
 
 import javax.ws.rs.*;
@@ -41,10 +42,10 @@ import static org.jruby.javasupport.JavaUtil.convertJavaToRuby;
 @Path("/")
 public class JRubyResource {
     private static final Logger LOG = new Logger(JRubyResource.class);
-    private final GraphDatabaseService database;
+    private final AbstractGraphDatabase database;
 
     public JRubyResource(@Context GraphDatabaseService database) {
-        this.database = database;
+        this.database = (AbstractGraphDatabase) database;
     }
 
     @POST @Consumes("application/x-www-form-urlencoded") @Path("/call")

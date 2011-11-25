@@ -21,8 +21,7 @@ package org.neo4j.server.extension.script;
 
 import junit.framework.TestCase;
 import org.jruby.embed.ScriptingContainer;
-import org.junit.After;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
@@ -39,20 +38,13 @@ import java.util.Map;
  */
 public class JRubyTest extends TestCase {
 
-    private static ImpermanentGraphDatabase neo4j = null;
+    private ImpermanentGraphDatabase neo4j = null;
 
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
+    @Before public void setup() throws Exception {
         neo4j = new ImpermanentGraphDatabase();
     }
 
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    @Test
-    public void testNeoRuby() throws UnsupportedEncodingException {
+    @Test public void testNeoRuby() throws UnsupportedEncodingException {
         System.out.println("It works");
         Map<String, String> env = System.getenv();
 

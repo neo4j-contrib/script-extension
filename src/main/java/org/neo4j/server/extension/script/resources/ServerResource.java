@@ -19,10 +19,12 @@
  */
 package org.neo4j.server.extension.script.resources;
 
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.kernel.AbstractGraphDatabase;
 
 import java.io.IOException;
+
+import static org.neo4j.server.extension.script.JRubyExtensionInitializer.CONFIG_PREFIX;
 
 /**
  * @author tbaum
@@ -33,35 +35,35 @@ public class ServerResource {
     private final String property;
 
     public ServerResource(String property) {
-        this.property = property;
+        this.property = CONFIG_PREFIX + property;
     }
 
-    public void delete(GraphDatabaseService gds) throws IOException {
+    public void delete(AbstractGraphDatabase gds) throws IOException {
         Transaction tx = gds.beginTx();
         try {
-            gds.getReferenceNode().removeProperty(property);
+            gds.getKernelData().properties().removeProperty(property);
             tx.success();
         } finally {
             tx.finish();
         }
     }
 
-    public boolean existInGraphDb(GraphDatabaseService gds) {
-        return gds.getReferenceNode().hasProperty(property);
+    public boolean existInGraphDb(AbstractGraphDatabase gds) {
+        return gds.getKernelData().properties().hasProperty(property);
     }
 
-    public String retrieve(final GraphDatabaseService gds) {
+    public String retrieve(final AbstractGraphDatabase gds) {
         try {
-            return (String) gds.getReferenceNode().getProperty(property);
+            return (String) gds.getKernelData().properties().getProperty(property);
         } catch (Exception e) {
             return null;
         }
     }
 
-    public boolean store(String data, GraphDatabaseService gds) throws IOException {
+    public boolean store(String data, AbstractGraphDatabase gds) throws IOException {
         Transaction tx = gds.beginTx();
         try {
-            gds.getReferenceNode().setProperty(property, data);
+            gds.getKernelData().properties().setProperty(property, data);
             tx.success();
         } finally {
             tx.finish();

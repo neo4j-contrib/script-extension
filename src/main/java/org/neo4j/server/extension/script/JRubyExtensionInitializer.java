@@ -22,6 +22,7 @@ package org.neo4j.server.extension.script;
 import org.apache.commons.configuration.Configuration;
 import org.mortbay.jetty.Server;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.NeoServerWithEmbeddedWebServer;
 import org.neo4j.server.logging.Logger;
@@ -38,22 +39,21 @@ import static org.neo4j.server.plugins.TypedInjectable.injectable;
 
 public class JRubyExtensionInitializer implements SPIPluginLifecycle {
 
+    public static final String CONFIG_PREFIX = JRubyExtensionInitializer.class.getPackage().getName() + ".";
     private static final Logger LOG = new Logger(JRubyExtensionInitializer.class);
 
-    @Override
-    public Collection<Injectable<?>> start(final GraphDatabaseService graphDatabaseService, final Configuration config) {
+    @Override public Collection<Injectable<?>> start(GraphDatabaseService graphDatabaseService, Configuration config) {
         throw new IllegalAccessError();
     }
 
     public void stop() {
     }
 
-    @Override
-    public Collection<Injectable<?>> start(final NeoServer neoServer) {
+    @Override public Collection<Injectable<?>> start(final NeoServer neoServer) {
         LOG.info("START " + JRubyExtensionInitializer.class.toString());
 
         final Server jetty = getJetty(neoServer);
-        final GraphDatabaseService gds = neoServer.getDatabase().graph;
+        final AbstractGraphDatabase gds = neoServer.getDatabase().graph;
         final Configuration configuration = neoServer.getConfiguration();
 
         final String gemHome = locateGemHome(configuration);

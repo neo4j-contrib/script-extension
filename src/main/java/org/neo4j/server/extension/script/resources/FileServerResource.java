@@ -19,7 +19,7 @@
  */
 package org.neo4j.server.extension.script.resources;
 
-import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.AbstractGraphDatabase;
 
 import java.io.*;
 
@@ -39,18 +39,18 @@ public class FileServerResource extends ServerResource {
         return file;
     }
 
-    @Override public void delete(final GraphDatabaseService gds) throws IOException {
+    @Override public void delete(final AbstractGraphDatabase gds) throws IOException {
         super.delete(gds);
         if (file.exists()) {
             file.delete();
         }
     }
 
-    @Override public boolean store(final String data, final GraphDatabaseService gds) throws IOException {
+    @Override public boolean store(final String data, final AbstractGraphDatabase gds) throws IOException {
         return super.store(data, gds) && updateFileSystem(gds);
     }
 
-    public boolean updateFileSystem(GraphDatabaseService gds) throws IOException {
+    public boolean updateFileSystem(AbstractGraphDatabase gds) throws IOException {
         String data = retrieve(gds);
 
         if (file.exists()) {

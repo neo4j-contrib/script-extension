@@ -27,7 +27,7 @@ import org.jruby.rack.RackApplicationFactory;
 import org.jruby.rack.RackContext;
 import org.jruby.rack.RackInitializationException;
 import org.jruby.util.collections.WeakHashSet;
-import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.server.extension.script.resources.GemfileServerResource;
 import org.neo4j.server.logging.Logger;
 
@@ -56,7 +56,7 @@ public class EmbeddedRackApplicationFactory extends DefaultRackApplicationFactor
     private final WeakHashSet<Ruby> runtimes = new WeakHashSet<Ruby>();
     private final GemfileServerResource gemFile;
     private final String gemHome;
-    private final GraphDatabaseService gds;
+    private final AbstractGraphDatabase gds;
 
     private final LogBufferOutputStream stderrLogger = new LogBufferOutputStream("E ");
     private final LogBufferOutputStream stdoutLogger = new LogBufferOutputStream("  ");
@@ -65,7 +65,7 @@ public class EmbeddedRackApplicationFactory extends DefaultRackApplicationFactor
 
     private Ruby runtime;
 
-    public EmbeddedRackApplicationFactory(final GraphDatabaseService gds, final String gemHome) throws IOException {
+    public EmbeddedRackApplicationFactory(final AbstractGraphDatabase gds, final String gemHome) throws IOException {
         this.gds = gds;
         this.gemHome = gemHome;
         this.defaultConfig = createDefaultConfig();

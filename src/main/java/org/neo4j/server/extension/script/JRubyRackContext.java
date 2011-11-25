@@ -24,7 +24,7 @@ import org.jruby.rack.*;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.FilterHolder;
-import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.server.extension.script.resources.FileServerResource;
 import org.neo4j.server.extension.script.resources.ServerResource;
 import org.neo4j.server.logging.Logger;
@@ -48,11 +48,11 @@ public class JRubyRackContext extends Context {
     private static final Logger LOG = new Logger(JRubyRackContext.class);
 
     private final ServerResource configRu;
-    private final GraphDatabaseService gds;
+    private final AbstractGraphDatabase gds;
     private final EmbeddedRackApplicationFactory factory;
     private final Configuration configuration;
 
-    public JRubyRackContext(String contextPath, GraphDatabaseService gds, Configuration configuration,
+    public JRubyRackContext(String contextPath, AbstractGraphDatabase gds, Configuration configuration,
                             EmbeddedRackApplicationFactory factory) throws IOException {
         super(null, contextPath, false, false);
         this.gds = gds;

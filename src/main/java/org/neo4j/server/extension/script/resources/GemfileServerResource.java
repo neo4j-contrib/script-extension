@@ -19,7 +19,7 @@
  */
 package org.neo4j.server.extension.script.resources;
 
-import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.AbstractGraphDatabase;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,13 +34,13 @@ public class GemfileServerResource extends FileServerResource {
         super(file, property);
     }
 
-    @Override public void delete(final GraphDatabaseService gds) throws IOException {
+    @Override public void delete(final AbstractGraphDatabase gds) throws IOException {
         super.delete(gds);
         new File(getFile().getCanonicalPath() + ".lock").delete();
 
     }
 
-    @Override public boolean updateFileSystem(final GraphDatabaseService gds) throws IOException {
+    @Override public boolean updateFileSystem(final AbstractGraphDatabase gds) throws IOException {
         final boolean changed = super.updateFileSystem(gds);
         new File(getFile().getCanonicalPath() + ".lock").delete();
         return changed;

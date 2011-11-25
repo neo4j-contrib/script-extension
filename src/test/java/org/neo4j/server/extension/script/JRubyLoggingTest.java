@@ -20,15 +20,11 @@
 package org.neo4j.server.extension.script;
 
 import com.sun.jersey.api.client.ClientResponse;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.server.NeoServerWithEmbeddedWebServer;
 import org.neo4j.server.RestRequest;
-import org.neo4j.server.helpers.ServerHelper;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -45,38 +41,22 @@ import static org.neo4j.server.helpers.ServerBuilder.server;
 public class JRubyLoggingTest {
     private static final String HOSTNAME = "localhost";
     private static final int PORT = 7473;
-    public static final String URI = "http://" + HOSTNAME + ":" + PORT + "/";
-    private static RestRequest request;
+    private static final String URI = "http://" + HOSTNAME + ":" + PORT + "/";
+    private RestRequest request;
+    private NeoServerWithEmbeddedWebServer server;
 
-    private static NeoServerWithEmbeddedWebServer server;
-
-    @BeforeClass
-    public static void startServer() throws URISyntaxException, IOException {
+    @Before public void setup() throws IOException, URISyntaxException {
         server = server().onPort(PORT).withThirdPartyJaxRsPackage("org.neo4j.server.extension.script", "/script").build();
-
         server.start();
         request = new RestRequest(new URI(URI));
         request.setMediaType(MediaType.TEXT_PLAIN_TYPE);
     }
 
-    @AfterClass
-    public static void stopServer() {
+    @After public void tearDown() {
         server.stop();
     }
 
-
-    @Before
-    public void cleanup() throws IOException {
-        final GraphDatabaseService gds = server.getDatabase().graph;
-        final Transaction tx = gds.beginTx();
-        gds.getReferenceNode().removeProperty("script/gemfile");
-        tx.success();
-        tx.finish();
-        ServerHelper.cleanTheDatabase(server);
-    }
-
-    @Test
-    public void testEval() throws Exception {
+    @Test public void testEval() throws Exception {
         final ClientResponse resp1 = request.post("script/gemfile", "" +
                 "source :gemcutter\n" +
                 "gem 'sinatra'\n");
@@ -142,5 +122,4 @@ public class JRubyLoggingTest {
         System.out.println(result6);
         response6.close();
     }
-
 }
