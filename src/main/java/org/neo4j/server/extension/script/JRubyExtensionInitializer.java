@@ -22,7 +22,7 @@ package org.neo4j.server.extension.script;
 import org.apache.commons.configuration.Configuration;
 import org.mortbay.jetty.Server;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.AbstractGraphDatabase;
+import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.NeoServerWithEmbeddedWebServer;
 import org.neo4j.server.logging.Logger;
@@ -53,7 +53,7 @@ public class JRubyExtensionInitializer implements SPIPluginLifecycle {
         LOG.info("START " + JRubyExtensionInitializer.class.toString());
 
         final Server jetty = getJetty(neoServer);
-        final AbstractGraphDatabase gds = neoServer.getDatabase().graph;
+        final GraphDatabaseAPI gds = neoServer.getDatabase().graph;
         final Configuration configuration = neoServer.getConfiguration();
 
         final String gemHome = locateGemHome(configuration);

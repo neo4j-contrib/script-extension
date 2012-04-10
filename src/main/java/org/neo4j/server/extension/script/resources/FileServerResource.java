@@ -20,6 +20,7 @@
 package org.neo4j.server.extension.script.resources;
 
 import org.neo4j.kernel.AbstractGraphDatabase;
+import org.neo4j.kernel.GraphDatabaseAPI;
 
 import java.io.*;
 
@@ -50,7 +51,7 @@ public class FileServerResource extends ServerResource {
         return super.store(data, gds) && updateFileSystem(gds);
     }
 
-    public boolean updateFileSystem(AbstractGraphDatabase gds) throws IOException {
+    public boolean updateFileSystem(GraphDatabaseAPI gds) throws IOException {
         String data = retrieve(gds);
 
         if (file.exists()) {

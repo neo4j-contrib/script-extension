@@ -21,6 +21,7 @@ package org.neo4j.server.extension.script.resources;
 
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
+import org.neo4j.kernel.GraphDatabaseAPI;
 
 import java.io.IOException;
 
@@ -48,11 +49,11 @@ public class ServerResource {
         }
     }
 
-    public boolean existInGraphDb(AbstractGraphDatabase gds) {
+    public boolean existInGraphDb(GraphDatabaseAPI gds) {
         return gds.getKernelData().properties().hasProperty(property);
     }
 
-    public String retrieve(final AbstractGraphDatabase gds) {
+    public String retrieve(final GraphDatabaseAPI gds) {
         try {
             return (String) gds.getKernelData().properties().getProperty(property);
         } catch (Exception e) {

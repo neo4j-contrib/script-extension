@@ -20,6 +20,7 @@
 package org.neo4j.server.extension.script.resources;
 
 import org.neo4j.kernel.AbstractGraphDatabase;
+import org.neo4j.kernel.GraphDatabaseAPI;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class GemfileServerResource extends FileServerResource {
 
     }
 
-    @Override public boolean updateFileSystem(final AbstractGraphDatabase gds) throws IOException {
+    @Override public boolean updateFileSystem(final GraphDatabaseAPI gds) throws IOException {
         final boolean changed = super.updateFileSystem(gds);
         new File(getFile().getCanonicalPath() + ".lock").delete();
         return changed;
